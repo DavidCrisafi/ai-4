@@ -1,4 +1,5 @@
 import argparse
+from puzzle import Puzzle
 
 parser = argparse.ArgumentParser(description='Sudoku Solver', prog='PROG')
 parser.add_argument('-f', '--file', help='File name of sudoku puzzle', type=str, required=True)
@@ -7,9 +8,10 @@ args = parser.parse_args()
 
 def main():    
     f = open(args.file, 'r')
-
-    puzzle = generatePuzzle(f)
-    printPuzzle(puzzle)
+    
+    puzzle = Puzzle(generatePuzzle(f))
+    
+    printPuzzle(puzzle.puzzle)
 
 
 def generatePuzzle(f):
