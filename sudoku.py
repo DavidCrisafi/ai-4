@@ -4,11 +4,13 @@ parser = argparse.ArgumentParser(description='Sudoku Solver', prog='PROG')
 parser.add_argument('-f', '--file', help='File name of sudoku puzzle', type=str, required=True)
 args = parser.parse_args()
 
+
 def main():    
     f = open(args.file, 'r')
 
     puzzle = generatePuzzle(f)
     printPuzzle(puzzle)
+
 
 def generatePuzzle(f):
     puzzle = []
@@ -24,6 +26,7 @@ def generatePuzzle(f):
         puzzle.insert(i, intLine)
     
     return puzzle
+
 
 #Beginner function; needs better formatting
 def printPuzzle(puzzle):
@@ -49,6 +52,7 @@ def printPuzzle(puzzle):
         print(line)
     
     print("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯")
+
 
 if __name__ == '__main__':
     main()
