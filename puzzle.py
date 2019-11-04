@@ -1,0 +1,37 @@
+class Puzzle(object):
+    
+
+    def __init__(self, puzzle):
+        self.puzzle = puzzle
+        self.domain = []
+
+        initDomain()
+
+    # initilizing the domain puzzle (0 to a list and number values to set values.
+    def initDomain(self):
+        for i in range(0,9):
+            for j in range(0,9):
+                if (self.puzzle[i][j] == 0):
+                    self.domain[i][j] = [1,2,3,4,5,6,7,8,9]
+                else:
+                    self.domain[i][j] = self.puzzle[i][j]
+
+    def getRowNumbers(self, rowNum):
+        numList = []
+        for i in range(0,9):
+            if (puzzle[i][rowNum] != 0):
+                if puzzle[i][rowNum] not in numList:
+                    numList.append(puzzle[i][rowNum])
+        return numList
+
+    def getColNumbers(self, colNum):
+        numList = []
+        for j in range(0,9):
+            if (puzzle[colNum][j] != 0):
+                if puzzle[colNum][j] not in numList:
+                    numList.append(puzzle[colNum][j])
+        return numList
+
+
+
+
