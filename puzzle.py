@@ -5,16 +5,19 @@ class Puzzle(object):
         self.puzzle = puzzle
         self.domain = []
 
-        initDomain()
+        self.initDomain()
 
     # initilizing the domain puzzle (0 to a list and number values to set values.
     def initDomain(self):
         for i in range(0,9):
+            newRow = []
             for j in range(0,9):
                 if (self.puzzle[i][j] == 0):
-                    self.domain[i][j] = [1,2,3,4,5,6,7,8,9]
+                    newRow.insert(j, [1,2,3,4,5,6,7,8,9])
                 else:
-                    self.domain[i][j] = self.puzzle[i][j]
+                    newRow.insert(j, self.puzzle[i][j])
+            
+            self.domain.insert(i, newRow)
 
     def getRowNumbers(self, rowNum):
         numList = []
