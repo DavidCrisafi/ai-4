@@ -59,16 +59,16 @@ class Puzzle(object):
         numList = self.getRowNumbers(row)
         numList = set(numList).union(self.getColNumbers(col))
         numList = set(numList).union(self.getZoneNumbers(zone))
-        return set([1, 2, 3, 4, 5, 6, 7, 8, 9]).difference(numList)
+        return list(set([1, 2, 3, 4, 5, 6, 7, 8, 9]).difference(numList))
 
     """ Gets all the values from a single sudoku board row 
         and returns them as a list """
     def getRowNumbers(self, rowNum):
         numList = []
         for i in range(0,9):
-            if (self.puzzle[i][rowNum] != 0):
-                if self.puzzle[i][rowNum] not in numList:
-                    numList.append(self.puzzle[i][rowNum])
+            if (self.puzzle[rowNum][i] != 0):
+                if self.puzzle[rowNum][i] not in numList:
+                    numList.append(self.puzzle[rowNum][i])
         return numList
 
     """ Gets all the values from a single sudoku board column 
@@ -76,9 +76,9 @@ class Puzzle(object):
     def getColNumbers(self, colNum):
         numList = []
         for j in range(0,9):
-            if (self.puzzle[colNum][j] != 0):
-                if self.puzzle[colNum][j] not in numList:
-                    numList.append(self.puzzle[colNum][j])
+            if (self.puzzle[j][colNum] != 0):
+                if self.puzzle[j][colNum] not in numList:
+                    numList.append(self.puzzle[j][colNum])
         return numList
       
     """ Gets all the values for a certain sudoku board grid/zone 
@@ -89,56 +89,56 @@ class Puzzle(object):
     def getZoneNumbers(self, zoneNum):
         numList = []
         if zoneNum == 0:
-            for i in range(0,3):
-                for j in range(0,3):
+            for j in range(0,3):
+                for i in range(0,3):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 1:
-            for i in range(3,6):
-                for j in range(0,3):
+            for j in range(3,6):
+                for i in range(0,3):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 2:
-            for i in range(6,9):
-                for j in range(0,3):
+            for j in range(6,9):
+                for i in range(0,3):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 3:
-            for i in range(0,3):
-                for j in range(3,6):
+            for j in range(0,3):
+                for i in range(3,6):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 4:
-            for i in range(3,6):
-                for j in range(3,6):
+            for j in range(3,6):
+                for i in range(3,6):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 5:
-            for i in range(6,9):
-                for j in range(3,6):
+            for j in range(6,9):
+                for i in range(3,6):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 6:
-            for i in range(0,3):
-                for j in range(6,9):
+            for j in range(0,3):
+                for i in range(6,9):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 7:
-            for i in range(3,6):
-                for j in range(6,9):
+            for j in range(3,6):
+                for i in range(6,9):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         elif zoneNum == 8:
-            for i in range(6,9):
-                for j in range(6,9):
+            for j in range(6,9):
+                for i in range(6,9):
                     if (self.puzzle[i][j] != 0):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
