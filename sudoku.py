@@ -13,6 +13,7 @@ def main():
     print(puzzle.getPossibleNumbers(3,8))
     
     printPuzzle(puzzle.puzzle)
+    temp = puzzle.getSoleCandidate(7, 0)
 
 
 def generatePuzzle(f):
