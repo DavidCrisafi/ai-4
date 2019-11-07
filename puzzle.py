@@ -143,3 +143,15 @@ class Puzzle(object):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         return numList
+
+    """ Checks the domain at the specified rowNum and colNum. If
+        it only has one value, the board and domain is set to the
+        value at that position and returns True. Otherwise, returns
+        False. """
+    def setSingleValue(self, rowNum, colNum):
+        if type(self.domain[rowNum][colNum]) is not list or len(self.domain[rowNum][colNum]) != 1:
+            return False
+        
+        self.domain[rowNum][colNum] = self.domain[rowNum][colNum][0]
+        self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
+        return True
