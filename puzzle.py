@@ -143,3 +143,29 @@ class Puzzle(object):
                         if self.puzzle[i][j] not in numList:
                             numList.append(self.puzzle[i][j])
         return numList
+
+    def nakedPair(self):
+        for j in range(0,9):
+            for i in range(0,9):
+                if len(self.domain[i][j]) != 2:
+                    continue
+                for z in range(i+1,9):
+
+                    if self.domain[i][j] == self.domain[z][j]:
+                        for t in range(0,9):
+                            if t == i or t == z or len(self.domain[t][j]) == 1:
+                                continue
+                            else:
+                                for x in self.domain[i][j]:
+                                    if x in self.domain[t][j]:
+                                        self.domain[t][j].remove(x)
+                for z in range(j+1,9):
+                    
+                    if self.domain[i][j] == self.domain[i][z]:
+                        for t in range(0,9):
+                            if t == j or t == z or len(self.domain[i][t]) == 1:
+                                continue
+                            else:
+                                for x in self.domain[i][j]:
+                                    if x in self.domain[i][t]:
+                                        self.domain[i][t].remove(x)

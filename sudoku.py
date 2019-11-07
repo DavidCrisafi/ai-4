@@ -10,7 +10,7 @@ def main():
     f = open(args.file, 'r')
     
     puzzle = Puzzle(generatePuzzle(f))
-    print(puzzle.getPossibleNumbers(3,8))
+    print(puzzle.getPossibleNumbers(0,1))
     
     printPuzzle(puzzle.puzzle)
 
