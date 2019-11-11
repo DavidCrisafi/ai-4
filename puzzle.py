@@ -25,7 +25,9 @@ class Puzzle(object):
     
     PUZZLE_MODE = 0
     DOMAIN_MODE = 1
-    
+   
+    #---------------------------- INITIALIZATION ----------------------------
+   
     def __init__(self, puzzle):
         """ Sudoku board as a 2D array[9][9] (9x9 grid) of integers """
         self.puzzle = puzzle
@@ -48,6 +50,103 @@ class Puzzle(object):
                     newRow.insert(j, self.puzzle[i][j])
 
             self.domain.insert(i, newRow)
+
+    #---------------------------- SOLVER FUNCTIONS ----------------------------
+    
+    def solve(self):
+        newChanges = True
+        while (newChanges):
+            newChanges = False
+            for row in range(0,9):
+                for column in range(0,9):
+                    if not self.puzzle[row][column]:
+                        result = self.getUniqueCandidate(row, column)
+                        
+                        if type(result) == int:
+                            self.domain[row][column] = result
+                            self.puzzle[row][column] = result
+                            newChanges = True
+    
+            
+    """ Combines all the unique candidate functions and finds out if there
+        is only one unique value between them all. If so, that is our unique
+        candidate and it gets returned."""
+    def getUniqueCandidate(self, row, col):
+        
+        if type(self.domain[row][col]) is int:
+            return self.domain[row][col]
+        elif len(self.domain[row][col]) == 1:
+            return self.domain[row][col][0]
+        
+        rowCand = self.getRowUniqueCandidate(row, col)
+        colCand = self.getColUniqueCandidate(row, col)
+        zoneCand = self.getZoneUniqueCandidate(row, col)
+        numList = []
+
+        if rowCand != None:
+            numList = getUnion(set(numList), rowCand)
+        elif colCand != None:
+            numList = getUnion(set(numList), colCand)
+        elif zoneCand != None:
+            numList = getUnion(set(numList), zoneCand)
+        if numList == []:
+            return None
+
+        if (type(numList) == list):
+            uniqueCandidate = set(self.domain[row][col]).difference(numList)
+        else:
+            return numList
+        
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
+
+    """ Checks the domain at the specified rowNum and colNum. If
+        it only has one value, the board and domain is set to the
+        value at that position and returns True. Otherwise, returns
+        False. """
+    def setSingleValue(self, rowNum, colNum):
+        if type(self.domain[rowNum][colNum]) is not list or len(self.domain[rowNum][colNum]) != 1:
+            return False
+        
+        self.domain[rowNum][colNum] = self.domain[rowNum][colNum][0]
+        self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
+        return True
+
+
+    def nakedPair(self):
+        changed = False
+        for j in range(0,9):
+            for i in range(0,9):
+                if isinstance(self.domain[i][j], int) or len(self.domain[i][j]) != 2:
+                    continue
+                for z in range(i+1,9):
+
+                    if self.domain[i][j] == self.domain[z][j]:
+                        for t in range(0,9):
+                            if t == i or t == z or isinstance(self.domain[t][j], int):
+                                continue
+                            else:
+                                for x in self.domain[i][j]:
+                                    if x in self.domain[t][j]:
+                                        self.domain[t][j].remove(x)
+                                        changed = True
+                for z in range(j+1,9):
+                    
+                    if self.domain[i][j] == self.domain[i][z]:
+                        for t in range(0,9):
+                            if t == j or t == z or isinstance(self.domain[i][t], int):
+                                continue
+                            else:
+                                for x in self.domain[i][j]:
+                                    if x in self.domain[i][t]:
+                                        self.domain[i][t].remove(x)
+                                        changed = True
+        return changed
+
+    #---------------------------- GET VALUES ----------------------------
 
     """ Based on your row and column, it returns your zone index as an int. """
     def getZone(self, row, col):
@@ -317,3 +416,13 @@ class Puzzle(object):
                     continue
                 valList = self.getPossibleNumbers(row=zoneRow, col=zoneCol, MODE=self.DOMAIN_MODE)
                 self.domain[zoneRow][zoneCol] = set(self.domain[zoneRow][zoneCol]).intersection(valList)
+    
+#---------------------------- HELPER FUNCTIONS ----------------------------
+    
+def getUnion(set1, set2):
+    if (type(set2) == set):
+        return set1.union(set2)
+    elif (type(set2) == int):
+        return set2
+    
+    return None
