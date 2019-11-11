@@ -10,15 +10,22 @@ def main():
     f = open(args.file, 'r')
     
     puzzle = Puzzle(generatePuzzle(f))
+    
+    #test(puzzle)
+    
+    printPuzzle(puzzle.puzzle)
+
+
+def test(puzzle):
     print(puzzle.getPossibleNumbers(0,1))
-    #puzzle.domain[0][0] = [7,8]
-    #puzzle.domain[7][0] = [7,8]
-    #puzzle.nakedPair()
-    #for i in range(0,9):
-    #    print(puzzle.domain[i][0])
+    puzzle.domain[0][0] = [7,8]
+    puzzle.domain[7][0] = [7,8]
+    puzzle.nakedPair()
+    for i in range(0,9):
+        print(puzzle.domain[i][0])
+    
     printPuzzle(puzzle.puzzle)
     #temp = puzzle.getSoleCandidate(7, 0)
-
 
 def generatePuzzle(f):
     puzzle = []
