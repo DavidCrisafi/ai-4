@@ -177,6 +177,33 @@ class Puzzle(object):
                             numList.append(listToScan[i][j])
         return numList
 
+
+    def nakedPair(self):
+        for j in range(0,9):
+            for i in range(0,9):
+                if isinstance(self.domain[i][j], int) or len(self.domain[i][j]) != 2:
+                    continue
+                for z in range(i+1,9):
+
+                    if self.domain[i][j] == self.domain[z][j]:
+                        for t in range(0,9):
+                            if t == i or t == z or isinstance(self.domain[t][j], int):
+                                continue
+                            else:
+                                for x in self.domain[i][j]:
+                                    if x in self.domain[t][j]:
+                                        self.domain[t][j].remove(x)
+                for z in range(j+1,9):
+                    
+                    if self.domain[i][j] == self.domain[i][z]:
+                        for t in range(0,9):
+                            if t == j or t == z or isinstance(self.domain[i][t], int):
+                                continue
+                            else:
+                                for x in self.domain[i][j]:
+                                    if x in self.domain[i][t]:
+                                        self.domain[i][t].remove(x)
+
     """ Combines all the unique candidate functions and finds out if there
         is only one unique value between them all. If so, that is our unique
         candidate and it gets returned."""
@@ -288,4 +315,3 @@ class Puzzle(object):
         self.domain[rowNum][colNum] = self.domain[rowNum][colNum][0]
         self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
         return True
-
