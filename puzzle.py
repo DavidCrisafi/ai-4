@@ -147,13 +147,13 @@ class Puzzle(object):
     def nakedPair(self):
         for j in range(0,9):
             for i in range(0,9):
-                if len(self.domain[i][j]) != 2:
+                if isinstance(self.domain[i][j], int) or len(self.domain[i][j]) != 2:
                     continue
                 for z in range(i+1,9):
 
                     if self.domain[i][j] == self.domain[z][j]:
                         for t in range(0,9):
-                            if t == i or t == z or len(self.domain[t][j]) == 1:
+                            if t == i or t == z or isinstance(self.domain[t][j], int):
                                 continue
                             else:
                                 for x in self.domain[i][j]:
@@ -163,7 +163,7 @@ class Puzzle(object):
                     
                     if self.domain[i][j] == self.domain[i][z]:
                         for t in range(0,9):
-                            if t == j or t == z or len(self.domain[i][t]) == 1:
+                            if t == j or t == z or isinstance(self.domain[i][t], int):
                                 continue
                             else:
                                 for x in self.domain[i][j]:

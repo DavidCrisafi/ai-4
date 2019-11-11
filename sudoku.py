@@ -11,7 +11,11 @@ def main():
     
     puzzle = Puzzle(generatePuzzle(f))
     print(puzzle.getPossibleNumbers(0,1))
-    
+    #puzzle.domain[0][0] = [7,8]
+    #puzzle.domain[7][0] = [7,8]
+    #puzzle.nakedPair()
+    #for i in range(0,9):
+    #    print(puzzle.domain[i][0])
     printPuzzle(puzzle.puzzle)
 
 
