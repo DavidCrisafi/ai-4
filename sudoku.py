@@ -14,6 +14,8 @@ def main():
     #test(puzzle)
     
     printPuzzle(puzzle.puzzle)
+    puzzle.solve()
+    printPuzzle(puzzle.puzzle)
 
 
 def test(puzzle):
@@ -66,7 +68,7 @@ def printPuzzle(puzzle):
             print("___________________________")
         print(line)
     
-    print("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯")
+    print("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯\n\n")
 
 
 if __name__ == '__main__':
