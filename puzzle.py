@@ -62,6 +62,7 @@ class Puzzle(object):
         return True
 
     def nakedPair(self):
+        changed = False
         for j in range(0,9):
             for i in range(0,9):
                 if isinstance(self.domain[i][j], int) or len(self.domain[i][j]) != 2:
@@ -76,6 +77,7 @@ class Puzzle(object):
                                 for x in self.domain[i][j]:
                                     if x in self.domain[t][j]:
                                         self.domain[t][j].remove(x)
+                                        changed = True
                 for z in range(j+1,9):
                     
                     if self.domain[i][j] == self.domain[i][z]:
@@ -86,6 +88,8 @@ class Puzzle(object):
                                 for x in self.domain[i][j]:
                                     if x in self.domain[i][t]:
                                         self.domain[i][t].remove(x)
+                                        changed = True
+        return changed
 
     #---------------------------- GET VALUES ----------------------------
 
