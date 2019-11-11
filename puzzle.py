@@ -1,3 +1,15 @@
+""" A dictionary where the key is the zone index,
+    and the value is a tuple of the row indices as a list
+    and the column indices as a list. This lets you know
+    the boundaries for a given zone.
+    Ex. ZONE_INDICES(0) would return ([0, 1, 2], [0, 1, 2])
+    and [0, 1, 2] are the indices for your rows and columns.
+    You start from 0 and end with 2 in your for loops."""
+ZONE_INDICES = {0: ([0, 1, 2], [0, 1, 2]), 1: ([0, 1, 2], [3, 4, 5]), 2: ([0, 1, 2], [6, 7, 8]),
+                3: ([3, 4, 5], [0, 1, 2]), 4: ([3, 4, 5], [3, 4, 5]), 5: ([3, 4, 5], [6, 7, 8]),
+                6: ([6, 7, 8], [0, 1, 2]), 7: ([6, 7, 8], [3, 4, 5]), 8: ([6, 7, 8], [6, 7, 8])}
+
+
 class Puzzle(object):
     """
         Puzzle Class creates an object that has a
@@ -5,6 +17,10 @@ class Puzzle(object):
         manipulating sudoku boards and returning
         information about them.
     """
+    
+    PUZZLE_MODE = 0
+    DOMAIN_MODE = 1
+    
     def __init__(self, puzzle):
         """ Sudoku board as a 2D array[9][9] (9x9 grid) of integers """
         self.puzzle = puzzle
@@ -15,7 +31,6 @@ class Puzzle(object):
 
         self.initDomain()
 
-    # initilizing the domain puzzle (0 to a list and number values to set values.
     """ Initializes the domain list with the actual puzzle values, or if a value is missing
         it finds a list of potential values."""
     def initDomain(self):
@@ -30,12 +45,8 @@ class Puzzle(object):
 
             self.domain.insert(i, newRow)
 
-    """ Returns the potential values for a given square 
-        based on its position in the sudoku board.
-        Input the row and column of the sudoku square, 
-        and the function will calculate the rest. """
-    def getPossibleNumbers(self, row, col):
-        """ Figures out which zone its in based on the row and column."""
+    """ Based on your row and column, it returns your zone index as an int. """
+    def getZone(self, row, col):
         zone = None
         if row in [0, 1, 2]:
             zone = [0, 1, 2]
@@ -50,6 +61,15 @@ class Puzzle(object):
             zone = set(zone).intersection([1, 4, 7]).pop()
         elif col in [6, 7, 8]:
             zone = set(zone).intersection([2, 5, 8]).pop()
+        return zone
+
+    """ Returns the potential values for a given square 
+        based on its position in the sudoku board.
+        Input the row and column of the sudoku square, 
+        and the function will calculate the rest. """
+    def getPossibleNumbers(self, row, col):
+        """ Figures out which zone its in balsed on the row and column."""
+        zone = self.getZone(row, col)
 
         """ Gets the current values from the sudoku board's rows, columns, and grids.
             Finds the difference between those values and all the potential values
@@ -58,7 +78,7 @@ class Puzzle(object):
                 The potential values returned would be [6,7,8,9]."""
         numList = self.getRowNumbers(row)
         numList = set(numList).union(self.getColNumbers(col))
-        numList = set(numList).union(self.getZoneNumbers(zone))
+        numList = set(numList).union(self.getZoneNumbers(zone, Puzzle.PUZZLE_MODE))
         return list(set([1, 2, 3, 4, 5, 6, 7, 8, 9]).difference(numList))
 
     """ Gets all the values from a single sudoku board row 
@@ -85,64 +105,78 @@ class Puzzle(object):
         and returns them as a list. Valid inputs:   
         0,1,2
         3,4,5
-        6,7,8   """
-    def getZoneNumbers(self, zoneNum):
+        6,7,8
+        
+        Whether it returns values from the puzzle or from the domain
+        depends on its mode flag. Puzzle.PUZZLE_MODE returns the puzzle
+        values, and Puzzle.DOMAIN_MODE returns the domain values.   """
+    def getZoneNumbers(self, zoneNum, mode):
         numList = []
+        listToScan = []
+        
+        if mode == Puzzle.PUZZLE_MODE:
+            listToScan = self.puzzle
+        elif mode == Puzzle.DOMAIN_MODE:
+            listToScan = self.domain
+        else:
+            raise Exception("Invalid mode flag passed to getZoneNumbers")
+        
         if zoneNum == 0:
             for j in range(0,3):
                 for i in range(0,3):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 1:
             for j in range(3,6):
                 for i in range(0,3):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 2:
             for j in range(6,9):
                 for i in range(0,3):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 3:
             for j in range(0,3):
                 for i in range(3,6):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 4:
             for j in range(3,6):
                 for i in range(3,6):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 5:
             for j in range(6,9):
                 for i in range(3,6):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 6:
             for j in range(0,3):
                 for i in range(6,9):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 7:
             for j in range(3,6):
                 for i in range(6,9):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         elif zoneNum == 8:
             for j in range(6,9):
                 for i in range(6,9):
-                    if (self.puzzle[i][j] != 0):
-                        if self.puzzle[i][j] not in numList:
-                            numList.append(self.puzzle[i][j])
+                    if (listToScan[i][j] != 0):
+                        if listToScan[i][j] not in numList:
+                            numList.append(listToScan[i][j])
         return numList
+
 
     def nakedPair(self):
         for j in range(0,9):
@@ -169,3 +203,115 @@ class Puzzle(object):
                                 for x in self.domain[i][j]:
                                     if x in self.domain[i][t]:
                                         self.domain[i][t].remove(x)
+
+    """ Combines all the unique candidate functions and finds out if there
+        is only one unique value between them all. If so, that is our unique
+        candidate and it gets returned."""
+    def getUniqueCandidate(self, row, col):
+        rowCand = self.getRowUniqueCandidate(row, col)
+        colCand = self.getColUniqueCandidate(row, col)
+        zoneCand = self.getZoneUniqueCandidate(row, col)
+        numList = []
+
+        if rowCand != None:
+            numList = set(numList).union(rowCand)
+        elif colCand != None:
+            numList = set(numList).union(colCand)
+        elif zoneCand != None:
+            numList = set(numList).union(zoneCand)
+        if numList == []:
+            return None
+
+        uniqueCandidate = set(self.domain[row][col]).difference(numList)
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
+
+    """ Find the only possibility for a number based on its row position.
+        If there is only one option, it returns that option.
+        If there are multiple options, it returns a list of the options. """
+    def getRowUniqueCandidate(self, rowNum, colNum):
+        """ If it is already an int, don't change it at all."""
+        if type(self.domain[rowNum][colNum]) == int:
+            return self.domain[rowNum][colNum]
+
+        numList = []
+        for i in range(0, 9):
+            if i == colNum:
+                continue
+            elif type(self.domain[rowNum][i]) == list:
+                numList = set(numList).union(self.domain[rowNum][i])
+
+        uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
+
+    """ Find the only possibility for a number based on its column position.
+        If there is only one option, it returns that option as an INT.
+        If there are multiple options, it returns a list of the options. """
+    def getColUniqueCandidate(self, rowNum, colNum):
+        """ If it is already an int, don't change it at all."""
+        if type(self.domain[rowNum][colNum]) == int:
+            return self.domain[rowNum][colNum]
+
+        numList = []
+        for i in range(0, 9):
+            if i == rowNum:
+                continue
+            elif type(self.domain[i][colNum]) == list:
+                numList = set(numList).union(self.domain[i][colNum])
+
+        uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
+
+    """ Find the only possibility for a number based on its zone position.
+        If there is only one option, it returns that option as an INT.
+        If there are multiple options, it returns a list of the options. 
+        
+        NOTE: Requires ROW index and COL index as args since we need to 
+        know which candidate we are looking at."""
+    def getZoneUniqueCandidate(self, rowNum, colNum):
+        """ Finds the zone index based on row and column. """
+        zoneNum = self.getZone(rowNum, colNum)
+
+        """ If it is already an int, don't change it at all."""
+        if type(self.domain[rowNum][colNum]) == int:
+            return self.domain[rowNum][colNum]
+
+        numList = []
+        rowIndices = ZONE_INDICES[zoneNum][0]
+        colIndices = ZONE_INDICES[zoneNum][1]
+        for i in rowIndices:
+            for j in colIndices:
+                if i == rowNum and j == colNum:
+                    continue
+                elif type(self.domain[i][j]) == list:
+                    numList = set(numList).union(self.domain[i][j])
+
+        uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
+
+    """ Checks the domain at the specified rowNum and colNum. If
+        it only has one value, the board and domain is set to the
+        value at that position and returns True. Otherwise, returns
+        False. """
+    def setSingleValue(self, rowNum, colNum):
+        if type(self.domain[rowNum][colNum]) is not list or len(self.domain[rowNum][colNum]) != 1:
+            return False
+        
+        self.domain[rowNum][colNum] = self.domain[rowNum][colNum][0]
+        self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
+        return True
