@@ -17,7 +17,7 @@ def main():
     #for i in range(0,9):
     #    print(puzzle.domain[i][0])
     printPuzzle(puzzle.puzzle)
-    temp = puzzle.getSoleCandidate(7, 0)
+    #temp = puzzle.getSoleCandidate(7, 0)
 
 
 def generatePuzzle(f):
