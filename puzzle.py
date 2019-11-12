@@ -67,41 +67,6 @@ class Puzzle(object):
                             self.puzzle[row][column] = result
                             newChanges = True
 
-    """ Combines all the unique candidate functions and finds out if there
-        is only one unique value between them all. If so, that is our unique
-        candidate and it gets returned."""
-    def getUniqueCandidate(self, row, col):
-        
-        if type(self.domain[row][col]) is int:
-            return self.domain[row][col]
-        elif len(self.domain[row][col]) == 1:
-            return self.domain[row][col][0]
-        
-        rowCand = self.getRowUniqueCandidate(row, col)
-        colCand = self.getColUniqueCandidate(row, col)
-        zoneCand = self.getZoneUniqueCandidate(row, col)
-        numList = []
-
-        if rowCand != None:
-            numList = getUnion(set(numList), rowCand)
-        elif colCand != None:
-            numList = getUnion(set(numList), colCand)
-        elif zoneCand != None:
-            numList = getUnion(set(numList), zoneCand)
-        if numList == []:
-            return None
-
-        if (type(numList) == list):
-            uniqueCandidate = set(self.domain[row][col]).difference(numList)
-        else:
-            return numList
-        
-        if len(uniqueCandidate) == 1:
-            return uniqueCandidate.pop()
-        elif len(uniqueCandidate) > 1:
-            return uniqueCandidate
-        return None
-
     """ Checks the domain at the specified rowNum and colNum. If
         it only has one value, the board and domain is set to the
         value at that position and returns True. Otherwise, returns
@@ -112,6 +77,7 @@ class Puzzle(object):
         
         self.domain[rowNum][colNum] = self.domain[rowNum][colNum][0]
         self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
+        self.recalculateDomain(rowNum, colNum)
         return True
 
 
@@ -274,6 +240,9 @@ class Puzzle(object):
         is only one unique value between them all. If so, that is our unique
         candidate and it gets returned."""
     def getUniqueCandidate(self, row, col):
+        if type(self.domain[row][col]) == int:
+            return self.domain[row][col]
+
         """ Find the only possibility for a number based on its row position.
             If there is only one option, it returns that option.
             If there are multiple options, it returns a list of the options. """
@@ -355,11 +324,11 @@ class Puzzle(object):
         numList = []
 
         if rowCand != None:
-            numList = set(numList).union(rowCand)
+            numList = getUnion(set(numList), rowCand)
         elif colCand != None:
-            numList = set(numList).union(colCand)
+            numList = getUnion(set(numList), colCand)
         elif zoneCand != None:
-            numList = set(numList).union(zoneCand)
+            numList = getUnion(set(numList), zoneCand)
         if numList == []:
             return None
 
@@ -369,19 +338,6 @@ class Puzzle(object):
         elif len(uniqueCandidate) > 1:
             return uniqueCandidate
         return None
-
-    """ Checks the domain at the specified rowNum and colNum. If
-        it only has one value, the board and domain is set to the
-        value at that position and returns True. Otherwise, returns
-        False. """
-    def setSingleValue(self, rowNum, colNum):
-        if type(self.domain[rowNum][colNum]) is not list or len(self.domain[rowNum][colNum]) != 1:
-            return False
-        
-        self.domain[rowNum][colNum] = self.domain[rowNum][colNum][0]
-        self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
-        self.recalculateDomain(rowNum, colNum)
-        return True
 
     """ Based on a row and column of a cell, it recalculates the adjacent 
         cells values for the domain. It never adds possibilities, only 
