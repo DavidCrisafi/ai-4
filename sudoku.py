@@ -13,8 +13,10 @@ def main():
     
     #test(puzzle)
     
+    print("---------------------- START ----------------------")
     printPuzzle(puzzle.puzzle)
     puzzle.solve()
+    print("---------------------- END ----------------------")
     printPuzzle(puzzle.puzzle)
 
 
