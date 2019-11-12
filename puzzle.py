@@ -34,7 +34,7 @@ class Puzzle(object):
         """ Domain is also a 2D array which has the values from the puzzle,
             but wherever there is a missing value, it inserts a list of
             potential values in the missing values position."""
-        self.domain = []
+        self.domain = puzzle
 
         self.initDomain()
 
@@ -47,7 +47,7 @@ class Puzzle(object):
                 if self.puzzle[i][j] == 0:
                     newRow.insert(j, self.getPossibleNumbers(i, j, self.PUZZLE_MODE))
                 else:
-                    newRow[j] = self.puzzle[i][j]
+                    newRow.insert(j, self.puzzle[i][j])
 
             self.domain.insert(i, newRow)
 
