@@ -43,11 +43,11 @@ class Puzzle(object):
     def initDomain(self):
         for i in range(0, 9):
             newRow = []
-            for j in range(0,9):
+            for j in range(0, 9):
                 if self.puzzle[i][j] == 0:
                     newRow.insert(j, self.getPossibleNumbers(i, j, self.PUZZLE_MODE))
                 else:
-                    newRow.insert(j, self.puzzle[i][j])
+                    newRow[j] = self.puzzle[i][j]
 
             self.domain.insert(i, newRow)
 
