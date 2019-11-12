@@ -114,7 +114,6 @@ class Puzzle(object):
         self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
         return True
 
-
     def nakedPair(self):
         changed = False
         for j in range(0,9):
