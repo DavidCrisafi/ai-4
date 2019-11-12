@@ -10,9 +10,14 @@ def main():
     f = open(args.file, 'r')
     
     puzzle = Puzzle(generatePuzzle(f))
+    
+    #test(puzzle)
+    
+    print("---------------------- START ----------------------")
 
     printPuzzle(puzzle.puzzle)
     puzzle.solve()
+    print("---------------------- END ----------------------")
     printPuzzle(puzzle.puzzle)
 
 

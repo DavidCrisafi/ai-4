@@ -66,6 +66,44 @@ class Puzzle(object):
                             self.domain[row][column] = result
                             self.puzzle[row][column] = result
                             newChanges = True
+            
+            if self.nakedPair():
+                newChanges = True
+
+    """ Combines all the unique candidate functions and finds out if there
+        is only one unique value between them all. If so, that is our unique
+        candidate and it gets returned."""
+    def getUniqueCandidate(self, row, col):
+        
+        if type(self.domain[row][col]) is int:
+            return self.domain[row][col]
+        elif len(self.domain[row][col]) == 1:
+            return self.domain[row][col][0]
+        
+        rowCand = self.getRowUniqueCandidate(row, col)
+        colCand = self.getColUniqueCandidate(row, col)
+        zoneCand = self.getZoneUniqueCandidate(row, col)
+        numList = []
+
+        if rowCand != None and type(numList) == list:
+            numList = getUnion(set(numList), rowCand)
+        elif colCand != None and type(numList) == list:
+            numList = getUnion(set(numList), colCand)
+        elif zoneCand != None and type(numList) == list:
+            numList = getUnion(set(numList), zoneCand)
+        if numList == []:
+            return None
+
+        if (type(numList) == list):
+            uniqueCandidate = set(self.domain[row][col]).difference(numList)
+        else:
+            return numList
+        
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
 
     """ Checks the domain at the specified rowNum and colNum. If
         it only has one value, the board and domain is set to the
@@ -284,103 +322,73 @@ class Puzzle(object):
 
         return numList
 
-    """ Combines all the unique candidate functions and finds out if there
-        is only one unique value between them all. If so, that is our unique
-        candidate and it gets returned."""
-    def getUniqueCandidate(self, row, col):
-        if type(self.domain[row][col]) == int:
-            return self.domain[row][col]
 
-        """ Find the only possibility for a number based on its row position.
-            If there is only one option, it returns that option.
-            If there are multiple options, it returns a list of the options. """
-        def getRowUniqueCandidate(self, rowNum, colNum):
-            """ If it is already an int, don't change it at all."""
-            if type(self.domain[rowNum][colNum]) == int:
-                return self.domain[rowNum][colNum]
+    def getRowUniqueCandidate(self, rowNum, colNum):
+        """ If it is already an int, don't change it at all."""
+        if type(self.domain[rowNum][colNum]) == int:
+            return self.domain[rowNum][colNum]
 
-            numList = []
-            for i in range(0, 9):
-                if i == colNum:
-                    continue
-                elif type(self.domain[rowNum][i]) == list:
-                    numList = set(numList).union(self.domain[rowNum][i])
-
-            uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
-            if len(uniqueCandidate) == 1:
-                return uniqueCandidate.pop()
-            elif len(uniqueCandidate) > 1:
-                return uniqueCandidate
-            return None
-
-        """ Find the only possibility for a number based on its column position.
-            If there is only one option, it returns that option as an INT.
-            If there are multiple options, it returns a list of the options. """
-        def getColUniqueCandidate(self, rowNum, colNum):
-            """ If it is already an int, don't change it at all."""
-            if type(self.domain[rowNum][colNum]) == int:
-                return self.domain[rowNum][colNum]
-
-            numList = []
-            for i in range(0, 9):
-                if i == rowNum:
-                    continue
-                elif type(self.domain[i][colNum]) == list:
-                    numList = set(numList).union(self.domain[i][colNum])
-
-            uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
-            if len(uniqueCandidate) == 1:
-                return uniqueCandidate.pop()
-            elif len(uniqueCandidate) > 1:
-                return uniqueCandidate
-            return None
-
-        """ Find the only possibility for a number based on its zone position.
-            If there is only one option, it returns that option as an INT.
-            If there are multiple options, it returns a list of the options. 
-            
-            NOTE: Requires ROW index and COL index as args since we need to 
-            know which candidate we are looking at."""
-        def getZoneUniqueCandidate(self, rowNum, colNum):
-            """ Finds the zone index based on row and column. """
-            zoneNum = self.getZone(rowNum, colNum)
-
-            """ If it is already an int, don't change it at all."""
-            if type(self.domain[rowNum][colNum]) == int:
-                return self.domain[rowNum][colNum]
-
-            numList = []
-            rowIndices = ZONE_INDICES[zoneNum][0]
-            colIndices = ZONE_INDICES[zoneNum][1]
-            for i in rowIndices:
-                for j in colIndices:
-                    if i == rowNum and j == colNum:
-                        continue
-                    elif type(self.domain[i][j]) == list:
-                        numList = set(numList).union(self.domain[i][j])
-
-            uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
-            if len(uniqueCandidate) == 1:
-                return uniqueCandidate.pop()
-            elif len(uniqueCandidate) > 1:
-                return uniqueCandidate
-            return None
-
-        rowCand = getRowUniqueCandidate(row, col)
-        colCand = getColUniqueCandidate(row, col)
-        zoneCand = getZoneUniqueCandidate(row, col)
         numList = []
+        for i in range(0, 9):
+            if i == colNum:
+                continue
+            elif type(self.domain[rowNum][i]) == list:
+                numList = set(numList).union(self.domain[rowNum][i])
 
-        if rowCand != None:
-            numList = getUnion(set(numList), rowCand)
-        elif colCand != None:
-            numList = getUnion(set(numList), colCand)
-        elif zoneCand != None:
-            numList = getUnion(set(numList), zoneCand)
-        if numList == []:
-            return None
+        uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
 
-        uniqueCandidate = set(self.domain[row][col]).difference(numList)
+    """ Find the only possibility for a number based on its column position.
+        If there is only one option, it returns that option as an INT.
+        If there are multiple options, it returns a list of the options. """
+    def getColUniqueCandidate(self, rowNum, colNum):
+        """ If it is already an int, don't change it at all."""
+        if type(self.domain[rowNum][colNum]) == int:
+            return self.domain[rowNum][colNum]
+
+        numList = []
+        for i in range(0, 9):
+            if i == rowNum:
+                continue
+            elif type(self.domain[i][colNum]) == list:
+                numList = set(numList).union(self.domain[i][colNum])
+
+        uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
+        if len(uniqueCandidate) == 1:
+            return uniqueCandidate.pop()
+        elif len(uniqueCandidate) > 1:
+            return uniqueCandidate
+        return None
+
+    """ Find the only possibility for a number based on its zone position.
+        If there is only one option, it returns that option as an INT.
+        If there are multiple options, it returns a list of the options. 
+        
+        NOTE: Requires ROW index and COL index as args since we need to 
+        know which candidate we are looking at."""
+    def getZoneUniqueCandidate(self, rowNum, colNum):
+        """ Finds the zone index based on row and column. """
+        zoneNum = self.getZone(rowNum, colNum)
+
+        """ If it is already an int, don't change it at all."""
+        if type(self.domain[rowNum][colNum]) == int:
+            return self.domain[rowNum][colNum]
+
+        numList = []
+        rowIndices = ZONE_INDICES[zoneNum][0]
+        colIndices = ZONE_INDICES[zoneNum][1]
+        for i in rowIndices:
+            for j in colIndices:
+                if i == rowNum and j == colNum:
+                    continue
+                elif type(self.domain[i][j]) == list:
+                    numList = set(numList).union(self.domain[i][j])
+
+        uniqueCandidate = set(self.domain[rowNum][colNum]).difference(numList)
         if len(uniqueCandidate) == 1:
             return uniqueCandidate.pop()
         elif len(uniqueCandidate) > 1:
