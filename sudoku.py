@@ -21,14 +21,15 @@ def main():
 
 
 def test(puzzle):
-    print(puzzle.getPossibleNumbers(0,1))
+    #print(puzzle.getPossibleNumbers(0,1))
     puzzle.domain[0][0] = [7,8]
-    puzzle.domain[7][0] = [7,8]
+    puzzle.domain[1][1] = [7,8]
     puzzle.nakedPair()
-    for i in range(0,9):
-        print(puzzle.domain[i][0])
+    for i in range(0,3):
+        for j in range(0,3):
+            print(puzzle.domain[i][j])
     
-    printPuzzle(puzzle.puzzle)
+    #printPuzzle(puzzle.puzzle)
     #temp = puzzle.getSoleCandidate(7, 0)
 
 def generatePuzzle(f):

@@ -124,6 +124,9 @@ class Puzzle(object):
             for i in range(0,9):
                 if isinstance(self.domain[i][j], int) or len(self.domain[i][j]) != 2:
                     continue
+                zoneNum = self.getZone(i,j)
+                zoneRowBounds = ZONE_INDICES[zoneNum][0]
+                zoneColBounds = ZONE_INDICES[zoneNum][1]
                 for z in range(i+1,9):
 
                     if self.domain[i][j] == self.domain[z][j]:
@@ -146,6 +149,24 @@ class Puzzle(object):
                                     if x in self.domain[i][t]:
                                         self.domain[i][t].remove(x)
                                         changed = True
+
+                for row in zoneRowBounds:
+                    for col in zoneColBounds:
+                        if i == row and j == col:
+                            continue
+                        elif (col < j and row == i) or row < i:
+                            continue
+                        elif self.domain[i][j] == self.domain[row][col]:
+                            for row2 in zoneRowBounds:
+                                for col2 in zoneColBounds:
+                                    if (i == row2 and col2 == j) or (row == row2 and col == col2) or isinstance(self.domain[row2][col2], int):
+                                        continue
+                                    else:
+                                        for x in self.domain[i][j]:
+                                            if x in self.domain[row2][col2]:
+                                                self.domain[row2][col2].remove(x)
+                                                changed = True
+
         return changed
 
     #---------------------------- GET VALUES ----------------------------
