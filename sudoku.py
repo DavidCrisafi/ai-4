@@ -10,9 +10,7 @@ def main():
     f = open(args.file, 'r')
     
     puzzle = Puzzle(generatePuzzle(f))
-    
-    #test(puzzle)
-    
+
     printPuzzle(puzzle.puzzle)
     puzzle.solve()
     printPuzzle(puzzle.puzzle)
