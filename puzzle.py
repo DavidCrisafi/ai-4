@@ -26,7 +26,7 @@ class Puzzle(object):
     PUZZLE_MODE = 0
     DOMAIN_MODE = 1
    
-    #---------------------------- INITIALIZATION ----------------------------
+    # ---------------------------- INITIALIZATION ----------------------------
    
     def __init__(self, puzzle):
         """ Sudoku board as a 2D array[9][9] (9x9 grid) of integers """
@@ -34,7 +34,7 @@ class Puzzle(object):
         """ Domain is also a 2D array which has the values from the puzzle,
             but wherever there is a missing value, it inserts a list of
             potential values in the missing values position."""
-        self.domain = puzzle
+        self.domain = []
 
         self.initDomain()
 
@@ -51,7 +51,7 @@ class Puzzle(object):
 
             self.domain.insert(i, newRow)
 
-    #---------------------------- SOLVER FUNCTIONS ----------------------------
+    # ---------------------------- SOLVER FUNCTIONS ----------------------------
     
     def solve(self):
         newChanges = True
@@ -66,8 +66,7 @@ class Puzzle(object):
                             self.domain[row][column] = result
                             self.puzzle[row][column] = result
                             newChanges = True
-    
-            
+
     """ Combines all the unique candidate functions and finds out if there
         is only one unique value between them all. If so, that is our unique
         candidate and it gets returned."""
