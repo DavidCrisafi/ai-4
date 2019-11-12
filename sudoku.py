@@ -16,6 +16,7 @@ def main():
     print("---------------------- START ----------------------")
 
     printPuzzle(puzzle.puzzle)
+    puzzle.triples()
     puzzle.solve()
     print("---------------------- END ----------------------")
     printPuzzle(puzzle.puzzle)
