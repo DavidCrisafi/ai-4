@@ -34,7 +34,7 @@ class Puzzle(object):
         """ Domain is also a 2D array which has the values from the puzzle,
             but wherever there is a missing value, it inserts a list of
             potential values in the missing values position."""
-        self.domain = puzzle
+        self.domain = []
 
         self.initDomain()
 
