@@ -80,7 +80,6 @@ class Puzzle(object):
         self.recalculateDomain(rowNum, colNum)
         return True
 
-
     def nakedPair(self):
         changed = False
         for j in range(0,9):
