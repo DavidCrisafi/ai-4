@@ -1,3 +1,5 @@
+import collections
+
 """ A dictionary where the key is the zone index,
     and the value is a tuple of the row indices as a list
     and the column indices as a list. This lets you know
@@ -135,75 +137,108 @@ class Puzzle(object):
                     num += 1
             return num
 
+        """ Returns true if the lists share x elements with the superset. x is a list of any size."""
+        def lists_share_x_elems(list1, list2, list3, superset, x):
+            if num_in_set(superset, self.domain[list1[0]][list1[1]]) in x \
+                    and num_in_set(superset, self.domain[list2[0]][list2[1]]) in x \
+                    and num_in_set(superset, self.domain[list3[0]][list3[1]]) in x:
+                return True
+            return False
+
+        """ Returns true if all three lists share only 1 elements"""
+        def lists_share_one_elem(list1, list2, list3):
+            if num_in_set(self.domain[list1[0]][list1[1]], self.domain[list2[0]][list2[1]]) == 1 and \
+                    num_in_set(self.domain[list1[0]][list1[1]], self.domain[list3[0]][list3[1]]) == 1 and \
+                    num_in_set(self.domain[list2[0]][list2[1]], self.domain[list1[0]][list1[1]]) == 1 and \
+                    num_in_set(self.domain[list2[0]][list2[1]], self.domain[list3[0]][list3[1]]) == 1 and \
+                    num_in_set(self.domain[list3[0]][list3[1]], self.domain[list1[0]][list1[1]]) == 1 and \
+                    num_in_set(self.domain[list3[0]][list3[1]], self.domain[list2[0]][list2[1]]) == 1:
+                return True
+            return False
+
+        """ Finds the intersect between the lists and the superset. 
+        Changes the lists to be the intersection.
+        If the lists all remained the same, return False. """
+        def intersected_with_superset(list1, list2, list3, superset):
+            temp1 = self.domain[list1[0]][list1[1]]
+            temp2 = self.domain[list2[0]][list2[1]]
+            temp3 = self.domain[list3[0]][list3[1]]
+
+            self.domain[list1[0]][list1[1]] = list(set(superset).intersection(self.domain[list1[0]][list1[1]]))
+            self.domain[list2[0]][list2[1]] = list(set(superset).intersection(self.domain[list2[0]][list2[1]]))
+            self.domain[list3[0]][list3[1]] = list(set(superset).intersection(self.domain[list3[0]][list3[1]]))
+
+            compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
+
+            """ If they didn't change, return False """
+            if compare(self.domain[list1[0]][list1[1]], temp1)\
+                    and compare(self.domain[list2[0]][list2[1]], temp2)\
+                    and compare(self.domain[list3[0]][list3[1]], temp3):
+                return False
+            return True
+
+        """ Find triple function finds triples, applies the changes, lets you know if anything changed."""
+        def find_triple(cell_indices):
+            changed = False
+
+            for i, cell_1 in enumerate(cell_indices):
+                if type(self.domain[cell_1[0]][cell_1[1]]) == int:
+                    continue
+                for j, cell_2 in enumerate(cell_indices[i + 1:]):
+                    if type(self.domain[cell_2[0]][cell_2[1]]) == int:
+                        continue
+                    for cell_3 in cell_indices[i + j + 2:]:
+                        if type(self.domain[cell_3[0]][cell_3[1]]) == int:
+                            continue
+
+                        super_set = triple_union(cell_1, cell_2, cell_3)
+                        for cell in cell_indices:
+                            if cell == cell_1 or cell == cell_2 or cell == cell_3 or \
+                                    type(self.domain[cell[0]][cell[1]]) == int:
+                                continue
+
+                            super_set = list(set(super_set).difference(self.domain[cell[0]][cell[1]]))
+
+                        if lists_share_x_elems(cell_1, cell_2, cell_3, super_set, [2]):
+                            if lists_share_one_elem(cell_1, cell_2, cell_3):
+                                if intersected_with_superset(cell_1, cell_2, cell_3, super_set):
+                                    changed = True
+                        elif lists_share_x_elems(cell_1, cell_2, cell_3, super_set, [2, 3]):
+                            if intersected_with_superset(cell_1, cell_2, cell_3, super_set):
+                                changed = True
+            return changed
+
+        has_changed = False
+
         """ Check the rows """
         for row in range(0, 9):
-            for cell_1 in range(0, 9):
-                if type(self.domain[row][cell_1]) == int:
-                    continue
-                for cell_2 in range(cell_1 + 1, 9):
-                    if type(self.domain[row][cell_2]) == int:
-                        continue
-                    for cell_3 in range(cell_2 + 1, 9):
-                        if type(self.domain[row][cell_3]) == int:
-                            continue
-                        super_set = triple_union((row, cell_1), (row, cell_2), (row, cell_3))
-                        for i in range(0, 9):
-                            if i == cell_1 or i == cell_2 or i == cell_3 or type(self.domain[row][i]) == int:
-                                continue
-                            super_set = list(set(super_set).difference(self.domain[row][i]))
-                        if num_in_set(super_set, self.domain[row][cell_1]) == 2\
-                                and num_in_set(super_set, self.domain[row][cell_2]) == 2\
-                                and num_in_set(super_set, self.domain[row][cell_3]) == 2:
-                            if num_in_set(self.domain[row][cell_1], self.domain[row][cell_2]) == 1 and \
-                                    num_in_set(self.domain[row][cell_1], self.domain[row][cell_3]) == 1 and \
-                                    num_in_set(self.domain[row][cell_2], self.domain[row][cell_1]) == 1 and \
-                                    num_in_set(self.domain[row][cell_2], self.domain[row][cell_3]) == 1 and \
-                                    num_in_set(self.domain[row][cell_3], self.domain[row][cell_1]) == 1 and \
-                                    num_in_set(self.domain[row][cell_3], self.domain[row][cell_2]) == 1:
-                                self.domain[row][cell_1] = list(set(super_set).intersection(self.domain[row][cell_1]))
-                                self.domain[row][cell_2] = list(set(super_set).intersection(self.domain[row][cell_2]))
-                                self.domain[row][cell_3] = list(set(super_set).intersection(self.domain[row][cell_3]))
-                        elif num_in_set(super_set, self.domain[row][cell_1]) in [2, 3]\
-                                and num_in_set(super_set, self.domain[row][cell_2]) in [2, 3]\
-                                and num_in_set(super_set, self.domain[row][cell_3]) in [2, 3]:
-                            self.domain[row][cell_1] = list(set(super_set).intersection(self.domain[row][cell_1]))
-                            self.domain[row][cell_2] = list(set(super_set).intersection(self.domain[row][cell_2]))
-                            self.domain[row][cell_3] = list(set(super_set).intersection(self.domain[row][cell_3]))
+            cellindices = []
+            for col in range(0, 9):
+                cellindices.append((row, col))
+            if find_triple(cellindices):
+                has_changed = True
 
         """ Check the columns """
         for col in range(0, 9):
-            for cell_1 in range(0, 9):
-                if type(self.domain[cell_1][col]) == int:
-                    continue
-                for cell_2 in range(cell_1 + 1, 9):
-                    if type(self.domain[cell_2][col]) == int:
-                        continue
-                    for cell_3 in range(cell_2 + 1, 9):
-                        if type(self.domain[cell_3][col]) == int:
-                            continue
-                        super_set = triple_union((cell_1, col), (cell_2, col), (cell_3, col))
-                        for i in range(0, 9):
-                            if i == cell_1 or i == cell_2 or i == cell_3 or type(self.domain[i][col]) == int:
-                                continue
-                            super_set = list(set(super_set).difference(self.domain[i][col]))
-                        if num_in_set(super_set, self.domain[cell_1][col]) == 2 \
-                                and num_in_set(super_set, self.domain[cell_2][col]) == 2 \
-                                and num_in_set(super_set, self.domain[cell_3][col]) == 2:
-                            if num_in_set(self.domain[cell_1][col], self.domain[cell_2][col]) == 1 and \
-                                    num_in_set(self.domain[cell_1][col], self.domain[cell_3][col]) == 1 and \
-                                    num_in_set(self.domain[cell_2][col], self.domain[cell_1][col]) == 1 and \
-                                    num_in_set(self.domain[cell_2][col], self.domain[cell_3][col]) == 1 and \
-                                    num_in_set(self.domain[cell_3][col], self.domain[cell_1][col]) == 1 and \
-                                    num_in_set(self.domain[cell_3][col], self.domain[cell_2][col]) == 1:
-                                self.domain[cell_1][col] = list(set(super_set).intersection(self.domain[cell_1][col]))
-                                self.domain[cell_2][col] = list(set(super_set).intersection(self.domain[cell_2][col]))
-                                self.domain[cell_3][col] = list(set(super_set).intersection(self.domain[cell_3][col]))
-                        elif num_in_set(super_set, self.domain[cell_1][col]) in [2, 3] \
-                                and num_in_set(super_set, self.domain[cell_2][col]) in [2, 3] \
-                                and num_in_set(super_set, self.domain[cell_3][col]) in [2, 3]:
-                            self.domain[cell_1][col] = list(set(super_set).intersection(self.domain[cell_1][col]))
-                            self.domain[cell_2][col] = list(set(super_set).intersection(self.domain[cell_2][col]))
-                            self.domain[cell_3][col] = list(set(super_set).intersection(self.domain[cell_3][col]))
+            cellindices = []
+            for row in range(0, 9):
+                cellindices.append((row, col))
+            if find_triple(cellindices):
+                has_changed = True
+
+        """ Check the zone """
+        for zone in range(0, 9):
+            rowBounds = ZONE_INDICES[zone][0]
+            colBounds = ZONE_INDICES[zone][1]
+            cellindices = []
+
+            for row in rowBounds:
+                for col in colBounds:
+                    cellindices.append((row, col))
+            if find_triple(cellindices):
+                has_changed = True
+
+        return has_changed
 
     def nakedPair(self):
         changed = False
