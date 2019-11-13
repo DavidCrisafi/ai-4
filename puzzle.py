@@ -63,12 +63,14 @@ class Puzzle(object):
                 for column in range(0, 9):
                     if not self.puzzle[row][column]:
                         result = self.getUniqueCandidate(row, column)
-                        
+
                         if type(result) == int:
                             self.domain[row][column] = result
                             self.puzzle[row][column] = result
+                            self.recalculateDomain(row, column)
                             newChanges = True
-            
+            if self.triples():
+                newChanges = True
             if self.nakedPair():
                 newChanges = True
 
@@ -120,6 +122,9 @@ class Puzzle(object):
         self.recalculateDomain(rowNum, colNum)
         return True
 
+    """ Figures out if 3 cells are in a triple configuration.
+        Looks at all possible combinations of cells.
+        Returns true if it makes a change. """
     def triples(self):
         """ Triple Union
         Takes the tuple of each lists indices and finds the domain for you
@@ -332,8 +337,8 @@ class Puzzle(object):
             ex. The Union of row's, col's, and zone's values unioned returned [1,2,3,4,5].
                 The potential values returned would be [6,7,8,9]."""
         numList = self.getRowNumbers(row, MODE)
-        numList = set(numList).union(self.getColNumbers(col, MODE))
-        numList = set(numList).union(self.getZoneNumbers(zone, MODE))
+        numList = list(set(numList).union(self.getColNumbers(col, MODE)))
+        numList = list(set(numList).union(self.getZoneNumbers(zone, MODE)))
         return list(set([1, 2, 3, 4, 5, 6, 7, 8, 9]).difference(numList))
 
     """ Gets all the values from a single sudoku board row 
@@ -380,7 +385,7 @@ class Puzzle(object):
             if listToScan[j][colNum] != 0 and type(listToScan[j][colNum]) != list:
                 if listToScan[j][colNum] not in numList:
                     numList.append(listToScan[j][colNum])
-        return numList
+        return list(numList)
       
     """ Gets all the values for a certain sudoku board grid/zone 
         and returns them as a list. Valid inputs:   
@@ -499,15 +504,15 @@ class Puzzle(object):
         for i in range(0, 9):
             if type(self.domain[row][i]) == int:
                 continue
-            valList = self.getPossibleNumbers(row=row, col=i, MODE=self.DOMAIN_MODE)
-            self.domain[row][i] = set(self.domain[row][i]).intersection(valList)
+            valList = list(self.getPossibleNumbers(row=row, col=i, MODE=self.DOMAIN_MODE))
+            self.domain[row][i] = list(set(self.domain[row][i]).intersection(valList))
 
         """ Recalculate everything in the same column """
         for j in range(0, 9):
             if type(self.domain[j][col]) == int:
                 continue
-            valList = self.getPossibleNumbers(row=j, col=col, MODE=self.DOMAIN_MODE)
-            self.domain[j][col] = set(self.domain[j][col]).intersection(valList)
+            valList = list(self.getPossibleNumbers(row=j, col=col, MODE=self.DOMAIN_MODE))
+            self.domain[j][col] = list(set(self.domain[j][col]).intersection(valList))
 
         """ Recalculate everything in the same zone """
         zone = self.getZone(row, col)
@@ -519,7 +524,7 @@ class Puzzle(object):
                 if type(self.domain[zoneRow][zoneCol]) == int:
                     continue
                 valList = self.getPossibleNumbers(row=zoneRow, col=zoneCol, MODE=self.DOMAIN_MODE)
-                self.domain[zoneRow][zoneCol] = set(self.domain[zoneRow][zoneCol]).intersection(valList)
+                self.domain[zoneRow][zoneCol] = list(set(self.domain[zoneRow][zoneCol]).intersection(valList))
     
 #---------------------------- HELPER FUNCTIONS ----------------------------
     
