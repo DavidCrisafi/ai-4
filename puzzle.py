@@ -1,4 +1,5 @@
 import collections
+import copy
 
 """ A dictionary where the key is the zone index,
     and the value is a tuple of the row indices as a list
@@ -40,6 +41,12 @@ class Puzzle(object):
 
         self.initDomain()
 
+    """ Creates a new puzzle object with the same board state. """
+    def __deepcopy__(self, memodict={}):
+        new_puzzle = Puzzle(copy.deepcopy(self.puzzle))
+        new_puzzle.domain = copy.deepcopy(self.domain)
+        return new_puzzle
+
     """ Initializes the domain list with the actual puzzle values, or if a value is missing
         it finds a list of potential values."""
     def initDomain(self):
@@ -56,6 +63,18 @@ class Puzzle(object):
     # ---------------------------- SOLVER FUNCTIONS ----------------------------
     
     def solve(self):
+        def getNewBoards():
+            board_states = []
+            for row in range(0, 9):
+                for col in range(0, 9):
+                    if type(self.domain[row][col]) == list:
+                        for val in self.domain[row][col]:
+                            new_board = self.__deepcopy__()
+                            new_board.domain[row][col] = [val]
+                            new_board.setSingleValue(row, col)
+                            board_states.append(new_board)
+                        return board_states
+
         newChanges = True
         while (newChanges):
             newChanges = False
@@ -73,6 +92,18 @@ class Puzzle(object):
                 newChanges = True
             if self.nakedPair():
                 newChanges = True
+            if self.findSingles():
+                newChanges = True
+        if self.isSolved() is False:
+            board_states = getNewBoards()
+
+            for board in board_states:
+                if board.solve():
+                    self.puzzle = board.puzzle
+                    return True
+            return False
+        else:
+            return True
 
     """ Combines all the unique candidate functions and finds out if there
         is only one unique value between them all. If so, that is our unique
@@ -121,6 +152,20 @@ class Puzzle(object):
         self.puzzle[rowNum][colNum] = self.domain[rowNum][colNum]
         self.recalculateDomain(rowNum, colNum)
         return True
+
+    """ Looks for single values until it stops finding any. 
+    Returns True if it makes a change. False otherwise"""
+    def findSingles(self):
+        changed = False
+        for row in range(0, 9):
+            for col in range(0, 9):
+                if self.setSingleValue(row, col):
+                    changed = True
+
+        if changed:
+            self.findSingles()
+
+        return changed
 
     """ Figures out if 3 cells are in a triple configuration.
         Looks at all possible combinations of cells.
@@ -296,7 +341,16 @@ class Puzzle(object):
 
         return changed
 
-    #---------------------------- GET VALUES ----------------------------
+    # ---------------------------- GET VALUES ----------------------------
+    """ Returns true if there is a value in each cell of the puzzle.
+        Assumes that the sudoku values are legally placed.
+        Could be changed to check for legality across row, col, and zone. """
+    def isSolved(self):
+        for row in range(0, 9):
+            for col in range(0, 9):
+                if self.puzzle[row][col] == 0 or type(self.puzzle[row][col]) == list:
+                    return False
+        return True
 
     """ Based on your row and column, it returns your zone index as an int. """
     def getZone(self, row, col):
@@ -526,8 +580,9 @@ class Puzzle(object):
                 valList = self.getPossibleNumbers(row=zoneRow, col=zoneCol, MODE=self.DOMAIN_MODE)
                 self.domain[zoneRow][zoneCol] = list(set(self.domain[zoneRow][zoneCol]).intersection(valList))
     
-#---------------------------- HELPER FUNCTIONS ----------------------------
-    
+# ---------------------------- HELPER FUNCTIONS ----------------------------
+
+
 def getUnion(set1, set2):
     if (type(set2) == set):
         return set1.union(set2)
