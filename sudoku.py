@@ -1,5 +1,6 @@
 import argparse
 from puzzle import Puzzle
+import time
 
 parser = argparse.ArgumentParser(description='Sudoku Solver', prog='PROG')
 parser.add_argument('-f', '--file', help='File name of sudoku puzzle', type=str, required=True)
@@ -15,9 +16,12 @@ def main():
     
     print("---------------------- START ----------------------")
     printPuzzle(puzzle.puzzle)
+    start = time.time()
     puzzle.solve()
+    end = time.time()
     print("---------------------- END ----------------------")
     printPuzzle(puzzle.puzzle)
+    print("Time elapsed to solve: ", end - start, "seconds")
 
 
 def test(puzzle):
